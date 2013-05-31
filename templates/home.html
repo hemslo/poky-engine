@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<div class="container">
+		<div class="row">
+			<div class="span6 offset4">
+				<img src="{{ static_url("img/logo.png") }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="span8 offset3">
+				<form action="/search" method="get">
+					<div class="input-append">
+						<input type="text" class="input-xxlarge" name="q">
+						<button type="submit" class="btn btn-primary">
+							<i class="icon-search icon-white"></i>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% end %}

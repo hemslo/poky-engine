@@ -12,3 +12,8 @@ Run
 ---
 
     python app.py
+
+Help
+----
+
+    python app.py --help
