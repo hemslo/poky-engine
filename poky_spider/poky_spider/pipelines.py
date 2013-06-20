@@ -34,5 +34,4 @@ class PokySpiderPipeline(object):
         document['body'] = fid
         documents.save(document)
 
-        # build reverse table
         return item
