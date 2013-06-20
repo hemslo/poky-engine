@@ -3,8 +3,10 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-
+import time
 from tornado.options import define, options
+from pymongo import MongoClient
+import gridfs
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -15,6 +17,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", MainHandler),
             (r"/search", SearchHandler),
+            (r"/cache", CacheHandler),
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -31,9 +34,36 @@ class MainHandler(tornado.web.RequestHandler):
 
 class SearchHandler(tornado.web.RequestHandler):
     ''' Search page handler'''
+    db = MongoClient().poky
+
     def get(self):
-        self.set_header("Content-Type", "text/plain")
-        self.write("You wrote " + self.get_argument("q"))
+        start_time = time.time()
+        query = self.get_argument("q")
+        term = self.db.terms.find_one({"word": query})
+        if term is None:
+            doc_ids = []
+        else:
+            doc_ids = [node["doc_id"] for node in term["posting"]]
+        documents = [self.db.documents.find_one({"_id": doc_id}) for doc_id in doc_ids]
+        documents.sort(key=lambda e: e["pagerank"], reverse=True)
+        self.render("search.html", documents=documents, query=query, time=time.time()-start_time)
+        # self.set_header("Content-Type", "text/plain")
+        # self.write("You wrote " + query)
+
+
+class CacheHandler(tornado.web.RequestHandler):
+    ''' Page Cache'''
+    db = MongoClient().poky
+    fs = gridfs.GridFS(db)
+
+    def get(self):
+        url = self.get_argument("url")
+        document = self.db.documents.find_one({"url": url})
+        if document:
+            self.set_header("Content-Type", "text/html")
+            self.write(self.fs.get(document["body"]).read())
+        else:
+            self.redirect('/')
 
 
 def main():

@@ -1,4 +1,45 @@
 {% extends "base.html" %}
 
 {% block body %}
+	<div class="container">
+		<div class="row">
+			<div class="span4">
+				<img src="{{ static_url("img/logo.png") }}">
+			</div>
+			<div class="span8">
+				<form action="/search" method="get">
+					<div class="input-append">
+						<input type="text" class="input-xxlarge" name="q" value={{query}}>
+						<button type="submit" class="btn btn-primary">
+							<i class="icon-search icon-white"></i>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+				<p>
+					{{ len(documents)}} results in total, cost {{ time }} s.
+				</p>
+				<ul>
+					{% for document in documents %}
+					<li>
+						<a href={{ document["url"] }}>
+							{% if document["text"]["title"] %}
+							{{ document["text"]["title"][0] }}
+							{% else %}
+							{{ document["url"] }}
+							{% end %}
+						</a>
+						<a href={{"/cache?url=%s" % document["url"]}}>Cache</a>
+						{% if document["text"]["description"] %}
+						<p> {{ document["text"]["description"][0] }}</p>
+						{% end %}
+					</li>
+					{% end %}
+				</ul>
+			</div>
+		</div>
+	</div>
 {% end %}
