@@ -64,6 +64,10 @@ def main():
     PR = PageRank(graph, 0.15)
     PR.CalPR()
     PR.printPR()
+    for key in PR.graph:
+        document = db.documents.find_one({"_id": key})
+        document["pagerank"] = PR.currentIter[key]
+        db.documents.save(document)
 
 if __name__ == '__main__':
     main()

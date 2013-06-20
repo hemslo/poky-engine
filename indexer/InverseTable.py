@@ -81,15 +81,15 @@ def main():
     inverse_table.CalNormalizingPara()
     # inverse_table.printRT()
 
-    # for key in inverse_table.table:
-    #     term = {}
-    #     term['word'] = key
-    #     term['df'] = inverse_table.table[key]['df']
-    #     term['idf'] = inverse_table.table[key]['idf']
-    #     term['posting'] = [{'doc_id': id,
-    #                         'tf': inverse_table.table[key]['posting'][id]
-    #                         } for id in inverse_table.table[key]['posting']]
-    #     db.terms.save(term)
+    for key in inverse_table.table:
+        term = {}
+        term['word'] = key
+        term['df'] = inverse_table.table[key]['df']
+        term['idf'] = inverse_table.table[key]['idf']
+        term['posting'] = [{'doc_id': id,
+                            'tf': inverse_table.table[key]['posting'][id]
+                            } for id in inverse_table.table[key]['posting']]
+        db.terms.save(term)
 
     for key in inverse_table.Normalization:
         document = db.documents.find_one({"_id": key})
