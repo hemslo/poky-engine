@@ -9,7 +9,7 @@ import redis
 class PokySpider(BaseSpider):
     name = "PokySpider"
     allowed_domains = []
-    start_urls = ['http://www.seu.edu.cn']
+    start_urls = ['http://www.seu.edu.cn', 'http://www.seu.edu.cn/s/132/main.jspy']
     pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
     link_extractor = SgmlLinkExtractor()
 

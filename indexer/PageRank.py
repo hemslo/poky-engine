@@ -63,7 +63,7 @@ def main():
         graph[document["_id"]] = document["links"]
     PR = PageRank(graph, 0.15)
     PR.CalPR()
-    PR.printPR()
+    # PR.printPR()
     for key in PR.graph:
         document = db.documents.find_one({"_id": key})
         document["pagerank"] = PR.currentIter[key]

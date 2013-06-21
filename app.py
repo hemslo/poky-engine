@@ -7,6 +7,7 @@ import time
 from tornado.options import define, options
 from pymongo import MongoClient
 import gridfs
+from indexer.Rank import QueryAnalysis, Ranker
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -35,20 +36,21 @@ class MainHandler(tornado.web.RequestHandler):
 class SearchHandler(tornado.web.RequestHandler):
     ''' Search page handler'''
     db = MongoClient().poky
+    ranker = Ranker()
+    qa = QueryAnalysis()
 
     def get(self):
         start_time = time.time()
         query = self.get_argument("q")
-        term = self.db.terms.find_one({"word": query})
-        if term is None:
-            doc_ids = []
-        else:
-            doc_ids = [node["doc_id"] for node in term["posting"]]
+        doc_ids = self.ranker.rank(self.qa.analysis(query))
+        # term = self.db.terms.find_one({"word": query})
+        # if term is None:
+            # doc_ids = []
+        # else:
+            # doc_ids = [node["doc_id"] for node in term["posting"]]
         documents = [self.db.documents.find_one({"_id": doc_id}) for doc_id in doc_ids]
-        documents.sort(key=lambda e: e["pagerank"], reverse=True)
+        # documents.sort(key=lambda e: e["pagerank"], reverse=True)
         self.render("search.html", documents=documents, query=query, time=time.time()-start_time)
-        # self.set_header("Content-Type", "text/plain")
-        # self.write("You wrote " + query)
 
 
 class CacheHandler(tornado.web.RequestHandler):
